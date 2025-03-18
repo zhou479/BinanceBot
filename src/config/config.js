@@ -29,7 +29,7 @@ const symbol = process.env.SYMBOL;
 const config = {
     coin:{      // 需要操作的币种
             symbol: symbol,
-            tradTime: null  // 可选，无则填null
+            tradTime: null  // 格式'2025-03-14 15:15'，可选，无则填null
         }
 };
 
