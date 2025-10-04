@@ -651,6 +651,63 @@ class BinanceAggregator {
             };
         }   
     }
+
+    /**
+     * 提现操作
+     * @param {string} symbol - 提现币种
+     * @param {string|number} amount - 提现数量
+     * @param {string} address - 提现地址
+     */
+    async binanceWithdraw(withdrawParams) {
+        try {
+            if (!withdrawParams) {
+                throw new Error('提现参数不完整，请确保提现币种、数量和提现地址都已提供');
+            }
+
+            if (withdrawParams.amount === 0) {
+                logger.info(`Account ${this.accountNum} | 将全部提现，查询账户余额`);
+
+                // 如果是资金账户提现，则查询资金账户余额
+                if (withdrawParams.walletType === 1) {
+                    const fundingResult = await this.binanceManager.queryFundingAccount(this.accountNum, withdrawParams.coin);
+                    if (fundingResult.success && fundingResult.fundingAccountInfo.length > 0) {
+                        withdrawParams.amount = fundingResult.fundingAccountInfo[0].free;
+                        logger.success(`Account ${this.accountNum} | 提现前的资金账户中 ${withdrawParams.coin} 数量为 ${withdrawParams.amount}`);
+                    } else if (fundingResult.success && fundingResult.fundingAccountInfo.length === 0) {
+                        logger.error(`Account ${this.accountNum} | 提现前的资金账户中${withdrawParams.coin} 数量为0，无法提现`)
+                        return;
+                    } else {
+                        logger.error(`Account ${this.accountNum} | 提现前的资金账户查询失败`);
+                        return;
+                    }
+                }
+
+                // 如果是现货账户提现，则查询现货账户余额
+                if (withdrawParams.walletType === 0) {
+                    const spotResult = await this.binanceManager.querySpotAccount(this.accountNum, withdrawParams.coin);
+                    if (spotResult.success && spotResult.spotAccountInfo.length > 0) {
+                        withdrawParams.amount = spotResult.spotAccountInfo[0].free;
+                        logger.success(`Account ${this.accountNum} | 提现前的现货账户中 ${withdrawParams.coin} 数量为 ${withdrawParams.amount}`);
+                    } else if (spotResult.success && spotResult.spotAccountInfo.length === 0) {
+                        logger.error(`Account ${this.accountNum} | 提现前的现货账户中${withdrawParams.coin} 数量为0，无法提现`)
+                        return;
+                    } else {
+                        logger.error(`Account ${this.accountNum} | 提现前的现货账户查询失败`);
+                        return;
+                    }
+                }
+            }
+
+            const withdrawResult = await this.binanceManager.binanceWithdraw(this.accountNum, withdrawParams);
+            if (!withdrawResult.success) {
+                throw new Error(`提现失败`);
+            }
+            logger.success(`Account ${this.accountNum} | 提现成功，币种: ${withdrawParams.coin}，数量: ${withdrawParams.amount}，提币至地址: ${withdrawParams.address}`);
+        } catch (error) {
+            logger.error(`Account ${this.accountNum} | 提现失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
 }
 
 module.exports = BinanceAggregator;

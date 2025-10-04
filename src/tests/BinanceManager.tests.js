@@ -1,3 +1,4 @@
+const { loggers } = require('winston');
 const BinanceManager = require('../core/BinanceManager');
 require('dotenv').config();
 
@@ -23,7 +24,7 @@ const apiSecret = process.env[`ACCOUNT${accountNum}_API_SECRET`];
     }
 
     // 3. 查询资金账户信息
-    if (true) {
+    if (false) {
         const fundingResult = await binanceManager.queryFundingAccount(accountNum, targetAsset);
         console.log(fundingResult.fundingAccountInfo);
     }
@@ -92,6 +93,33 @@ const apiSecret = process.env[`ACCOUNT${accountNum}_API_SECRET`];
     if (false) {
         const withdrawResult = await binanceManager.withdraw(accountNum, 'BTC', 0.001, '1234567890', 'TRC20');
         console.log(withdrawResult);
+    }
+    // 14. 获取链上赚币产品
+    if(false) {
+        try{
+            while(true) {
+                await binanceManager.getOnChainInfo();
+                await new Promise(resolve => setTimeout(resolve, 3000));
+            }
+        } catch(error) {
+            loggers.error('循环执行出错，继续')
+        }
+    }
+
+    // 15. 提现测试
+    if(false) {
+        try{
+            const address = 'xxx';
+            const withdrawResult = await binanceManager.binanceWithdraw(accountNum, 'USDT', 1, address);
+            console.log(withdrawResult);
+        } catch(error) {
+            console.log(error);
+        }
+    }
+    // 16. 获取币种信息
+    if(false) {
+        const symbolBalanceResult = await binanceManager.getSymbolBalance(accountNum, 'USDT');
+        // console.log(symbolBalanceResult);
     }
 })();
 

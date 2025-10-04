@@ -8,13 +8,15 @@ const loadAccounts = () => {
         const accountNum = process.env[`ACCOUNT${accountIndex}_NUM`];
         const apiKey = process.env[`ACCOUNT${accountIndex}_API_KEY`];
         const apiSecret = process.env[`ACCOUNT${accountIndex}_API_SECRET`];
-        
+        const withdrawToAddress = process.env[`ACCOUNT${accountIndex}_WITHDRAW_TO_ADDRESS`];
+
         if (!apiKey || !apiSecret) break;
         
         accounts.push({
             accountNum,
             apiKey,
-            apiSecret
+            apiSecret,
+            withdrawToAddress
         });
         accountIndex++;
     }

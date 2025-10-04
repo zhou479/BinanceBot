@@ -364,6 +364,65 @@ class BinanceManager {
             return {success: false, cancelOrderResult: null}
         }
     }
-}
 
+    /**
+     * 11. 获取K线数据
+    */
+    async getKlines(accountNum, symbol, interval, limit) {
+        try {
+            const klines = await this.client.getKlines(symbol, interval, limit);
+            return {success: true, klines: klines}
+        } catch (error) {
+            logger.error(`Account ${accountNum} | getKlines函数错误: ${error.message}`);
+            return {success: false, klines: null}
+        }   
+    }
+
+    /**
+     * 12. 获取链上赚币产品
+     */
+    async getOnChainInfo() {
+        try{
+            // const onChainInfo = await this.client.getOnchainYieldsLockedProducts();
+            const subscribeOnChainProduct = await this.client.subscribeOnchainYieldsLockedProduct({
+                projectId: 'Plasma-USDT-60D',
+                amount: 50000
+                }
+            );
+            
+            // console.log(onChainInfo.rows);
+            console.log(subscribeOnChainProduct.success);
+        } catch (error) {
+            // console.log(error);
+            logger.error(error.message);
+        }
+    }
+
+    /**
+     * 13. 提现操作
+     */
+    async binanceWithdraw(accountNum, withdrawParams) {
+        try {
+            
+            const binanceWithdrawResult = await this.client.withdraw(withdrawParams);
+            // console.log(binanceWithdrawResult);
+            return {success: true, binanceWithdrawResult: binanceWithdrawResult}
+        } catch (error) {
+            logger.error(`Account ${accountNum} | binanceWithdraw函数错误: ${error.message}`);
+            return {success: false, binanceWithdrawResult: null}
+        }
+    }
+
+    /**
+     * 14. 获取币种信息
+     */
+    async getSymbolBalance(accountNum, symbol) {
+        const getSymbolBalanceResult = await this.client.getBalances();
+        if(getSymbolBalanceResult.forEach(item => {
+            if(item.coin === symbol) {
+                console.log(item);
+            }
+        }));
+    }
+}
 module.exports = BinanceManager;

@@ -10,7 +10,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "binance": "^2.15.1",
+    "binance": "^3.0.6",
     "decimal.js": "^10.4.3",
     "dotenv": "^16.4.7",
     "winston": "^3.17.0"
